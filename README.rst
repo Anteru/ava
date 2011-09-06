@@ -1,4 +1,3 @@
-========================================
 Ava - Simple graph-based video processor
 ========================================
 
@@ -27,7 +26,7 @@ Todo
 There's a bunch of stuff left if you want to make re-use easier:
 
 * Loading the configuration from an external file (this can be trivially done
-	using the JSON)
+  using the JSON)
 * GUI for the graph editing
 * More useful nodes
 * Better integration with dot
