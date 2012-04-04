@@ -79,7 +79,7 @@ class ImageSequence(Node):
         self.offset = offset
         
     def Execute (self, index, target):
-        an = [CONVERT, self.format.format (index+self.offset), target]
+        an = [CONVERT, '-type', 'TrueColor', self.format.format (index+self.offset), target]
         subprocess.call(an)
         
         return target
@@ -128,7 +128,6 @@ class MergeTiledNode (Node):
     def Eval(self, input, Output, index):
         an = [MONTAGE] + input + ['-mode', 'Concatenate', '-tile', '2x2', Output]
         subprocess.call(an)
-    
         
 class OutputNode(Node):
     """Forward the output. This node ensures that the output is consitent and can
@@ -140,7 +139,7 @@ class OutputNode(Node):
         super().__init__(name, inputs)
         
     def Eval(self, input, Output, index):
-        an = [CONVERT, '-define', 'png:color-type=2', '-depth', '8', input, 'PNG24:' + Output]
+        an = [CONVERT, '-type', 'TrueColor', '-depth', '8', input, Output]
         subprocess.call(an)
         
 class SubstreamNode(Node):
@@ -165,9 +164,23 @@ class RepeatImageNode(Node):
         self.image = image
         
     def Execute (self, index, target):
-        an = [CONVERT, self.image, target]
+        an = [CONVERT, '-type', 'TrueColor', self.image, target]
         subprocess.call(an)
         
+        return target
+        
+    def GetStreamSize(self):
+        return self.duration
+        
+class RepeatInputNode(Node):
+    """Repeat an input multiple times."""
+    def __init__(self, name, inputs, frame, duration = 24):
+        super().__init__(name, inputs)
+        self.duration = duration
+        self.frame = frame
+        
+    def Execute (self, index, target):
+        self.inputs [0].Execute (self.frame, target)
         return target
         
     def GetStreamSize(self):
@@ -628,6 +641,8 @@ def CreateGraph(graphDesc):
                 n = FadeOutNode (name, inputs, **params)
             elif t == 'StillImage':
                 n = RepeatImageNode (name, **params)
+            elif t == 'EvaluateFrame':
+                n = RepeatInputNode (name, inputs, **params)
             elif t == 'SubSequence':
                 n = SubstreamNode (name, inputs, **params)
             elif t == 'Output':
