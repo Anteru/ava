@@ -2,8 +2,8 @@ Ava - Simple graph-based video processor
 ========================================
 
 :Authors:
-	Matth‰us G. Chajdas
-	
+	Matth√§us G. Chajdas
+
 Overview
 --------
 
